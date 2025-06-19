@@ -1,6 +1,5 @@
 package ru.aston.hometask.service.api;
 
-
 import java.util.List;
 
 public interface ISubjectService {
