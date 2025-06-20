@@ -12,9 +12,11 @@ import ru.aston.hometask.service.api.ISubjectService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
 public class Menu {
     private static final String MESSAGE_INCORRECT_INPUT = "Вы ввели неверное значение";
@@ -52,7 +54,7 @@ public class Menu {
         }
     }
 
-    public void menuStudents() {
+    private void menuStudents() {
         while (true) {
             Section.STUDENTS.printMenu();
             int choice = getChoice(Section.STUDENTS.menus.size());
@@ -67,7 +69,7 @@ public class Menu {
         }
     }
 
-    public void menuSubject() {
+    private void menuSubject() {
         while (true) {
             Section.SUBJECTS.printMenu();
             int choice = getChoice(Section.SUBJECTS.menus.size());
@@ -81,7 +83,7 @@ public class Menu {
         }
     }
 
-    public void menuMark() {
+    private void menuMark() {
         while (true) {
             Section.MARKS.printMenu();
             int choice = getChoice(Section.MARKS.menus.size());
@@ -95,9 +97,82 @@ public class Menu {
         }
     }
 
-    public void customExceptionHandler(Runnable runnable) {
+    private void addStudent() {
+        Student student = getInputStudent();
+
+        executeHandler(() -> studentService.save(student));
+    }
+
+    private void getAllStudents() {
+        executeHandler(() -> studentService.getAll().forEach(System.out::println));
+    }
+
+
+    private void findStudents() {
+        StudentFilter studentFilter = getInputStudentFilter();
+
+        executeHandler(() ->
+                studentService.findByFilter(studentFilter).forEach(System.out::println));
+    }
+
+
+    private void addSubject() {
+        System.out.println("Введите название предмета");
+        String subject = scanner.nextLine();
+
+        executeHandler(() -> subjectService.save(subject));
+    }
+
+    private void getAllSubject() {
+        executeHandler(() -> subjectService.getAll().forEach(System.out::println));
+    }
+
+    private void addMark() {
+        Optional<List<String>> maybeSubjects = executeReturnValueHandler(subjectService::getAll);
+        if (maybeSubjects.isEmpty() || maybeSubjects.get().isEmpty()) {
+            System.out.println("нет сохраненных предметов");
+            return;
+        }
+        List<String> subjects = maybeSubjects.get();
+
+        String subject = getChoiceSubjectFrom(subjects);
+        System.out.println("выбран " + subject);
+
+        Optional<List<Student>> maybeStudents = executeReturnValueHandler(studentService::getAll);
+        if (maybeStudents.isEmpty() || maybeStudents.get().isEmpty()) {
+            System.out.println("Нет сохраненных студентов");
+            return;
+        }
+        List<Student> students = maybeStudents.get();
+
+        List<StudentMark> result = new ArrayList<>();
+        System.out.printf("Введите оценки для студентов: Минимальный бал %d, максимальный %d\n", MIN_MARK, MAX_MARK);
+        for (Student student : students) {
+            System.out.println(student.getFirstname() + " " + student.getLastname());
+            result.add(new StudentMark(student, getChoiceInRange(MIN_MARK, MAX_MARK)));
+        }
+
+        executeHandler(() -> markService.save(result, subject));
+    }
+
+    private void getMark() {
+        Optional<List<String>> maybeSubjects = executeReturnValueHandler(subjectService::getAll);
+        if (maybeSubjects.isEmpty() || maybeSubjects.get().isEmpty()) {
+            System.out.println("нет сохраненных предметов");
+            return;
+        }
+        List<String> subjects = maybeSubjects.get();
+
+        String subject = getChoiceSubjectFrom(subjects);
+        System.out.println("выбран " + subject);
+
+        executeHandler(() -> markService.getAllBy(subject).forEach(System.out::println));
+    }
+
+    private void executeHandler(Runnable action) {
         try {
-            runnable.run();
+            action.run();
+            System.out.println("Успешное выполнение операции");
         } catch (ValidationException validationException) {
             validationException.getErrors()
                     .stream()
@@ -110,89 +185,15 @@ public class Menu {
         }
     }
 
-
-    public void addStudent() {
-        Student student = getInputStudent();
-
-        customExceptionHandler(() -> studentService.save(student));
-        System.out.println("Студент успешно сохранен");
-    }
-
-    public void getAllStudents() {
-        customExceptionHandler(() -> studentService.getAll().forEach(System.out::println));
-    }
-
-
-    public void findStudents() {
-        StudentFilter studentFilter = getInputStudentFilter();
-
-        customExceptionHandler(() ->
-                studentService.findByFilter(studentFilter).forEach(System.out::println));
-    }
-
-
-    public void addSubject() {
-        System.out.println("Введите название предмета");
-        String subject = scanner.nextLine();
-
-        customExceptionHandler(() -> subjectService.save(subject));
-
-        System.out.printf("Предмет %s добавлен\n", subject);
-    }
-
-    public void getAllSubject() {
-        customExceptionHandler(() -> subjectService.getAll().forEach(System.out::println));
-    }
-
-    public void addMark() {
+    public <T> Optional<T> executeReturnValueHandler(Supplier<T> supplier) {
         try {
-            List<String> subjects = subjectService.getAll();
-            if (subjects.isEmpty()) {
-                System.out.println("нет сохраненных предметов");
-                return;
-            }
-
-            String subject = getChoiceSubjectFrom(subjects);
-            System.out.println("выбран " + subject);
-
-            List<Student> students = studentService.getAll();
-            if (students.isEmpty()) {
-                System.out.println("Нет сохраненных студентов");
-            }
-
-            List<StudentMark> result = new ArrayList<>();
-            System.out.printf("Введите оценки для студентов: Минимальный бал %d, максимальный %d\n", MIN_MARK, MAX_MARK);
-            for (Student student : students) {
-                System.out.println(student.getFirstname() + " " + student.getLastname());
-                result.add(new StudentMark(student, getChoiceInRange(MIN_MARK, MAX_MARK)));
-            }
-
-
-            markService.save(result, subject);
-            System.out.println("Оценки успешно сохранены");
+            return Optional.ofNullable(supplier.get());
         } catch (FileServiceException fileEx) {
             System.out.println(fileEx.getMessage());
         } catch (Exception e) {
-            System.out.println("Произошла внутреняя ошибка во время сохранения");
+            System.out.println("Произошла внутреняя ошибка приложения: " + e);
         }
-    }
-
-    public void getMark() {
-        try {
-            List<String> subjects = subjectService.getAll();
-            if (subjects.isEmpty()) {
-                System.out.println("нет сохраненных предметов");
-                return;
-            }
-            String subject = getChoiceSubjectFrom(subjects);
-            System.out.println("выбран " + subject);
-
-            markService.getAllBy(subject).forEach(System.out::println);
-        } catch (FileServiceException fileEx) {
-            System.out.println(fileEx.getMessage());
-        } catch (Exception e) {
-            System.out.println("Произошла внутреняя ошибка во время получения информации");
-        }
+        return Optional.empty();
     }
 
     private String getChoiceSubjectFrom(List<String> subjects) {
