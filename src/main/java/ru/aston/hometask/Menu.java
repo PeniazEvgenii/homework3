@@ -265,8 +265,9 @@ public class Menu {
 
         public void printMenu() {
             System.out.println("Выберите необходимый раздел");
-            AtomicInteger i = new AtomicInteger(1);
-            this.menus.forEach(s -> System.out.printf("%d. %s\n", i.getAndIncrement(), s));
+            for (int i = 0; i < menus.size(); i++) {
+                System.out.printf("%d. %s\n", i + 1, menus.get(i));
+            }
         }
     }
 }
