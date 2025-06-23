@@ -27,7 +27,7 @@ class StudentValidatorTest {
     }
 
     @Test
-    void shouldThrowExceptionWithThreeError() {
+    void when_allFieldsEmpty_then_throwThreeErrors() {
         student.setFirstname("");
         student.setLastname("");
         student.setBirthDate("");
@@ -42,7 +42,7 @@ class StudentValidatorTest {
     }
 
     @Test
-    void shouldThrowOnFirstnameNull() {
+    void when_firstnameNull_then_throwValidationException() {
         student.setLastname("Петров");
         student.setBirthDate("31-10-2010");
 
@@ -50,7 +50,7 @@ class StudentValidatorTest {
     }
 
     @Test
-    void shouldThrowOnFirstnameTwoWord() {
+    void when_firstnameHasTwoWords_then_throwValidationException() {
         student.setFirstname("Иван иван");
         student.setLastname("Петров");
         student.setBirthDate("31-10-2010");
@@ -59,7 +59,7 @@ class StudentValidatorTest {
     }
 
     @Test
-    void shouldThrowOnFirstnameInForeignLanguage() {
+    void when_firstnameInForeignLanguage_then_throwValidationException() {
         student.setFirstname("Ivan");
         student.setLastname("Петров");
         student.setBirthDate("31-10-2010");
@@ -68,7 +68,7 @@ class StudentValidatorTest {
     }
 
     @Test
-    void shouldNotThrowOnFirstnameWithOneRusWord() {
+    void when_firstnameIsSingleRussianWord_then_notThrow() {
         student.setFirstname("Иван");
         student.setLastname("Петров");
         student.setBirthDate("31-10-2010");
@@ -77,7 +77,7 @@ class StudentValidatorTest {
     }
 
     @Test
-    void shouldNotThrowOnFirstnameTwoWordWithHyphen() {
+    void when_firstnameContainsHyphen_then_notThrow() {
         student.setFirstname("Иван-иван");
         student.setLastname("Петров");
         student.setBirthDate("31-10-2010");
@@ -86,7 +86,7 @@ class StudentValidatorTest {
     }
 
     @Test
-    void shouldThrowOnLastnameNull() {
+    void when_lastnameNull_then_throwValidationException() {
         student.setFirstname("Иван");
         student.setBirthDate("31-10-2010");
 
@@ -94,7 +94,7 @@ class StudentValidatorTest {
     }
 
     @Test
-    void shouldThrowOnLastnameTwoWord() {
+    void when_lastnameHasTwoWords_then_throwValidationException() {
         student.setFirstname("Иван");
         student.setLastname("Петров петров");
         student.setBirthDate("31-10-2010");
@@ -103,7 +103,7 @@ class StudentValidatorTest {
     }
 
     @Test
-    void shouldThrowOnLastnameInForeignLanguage() {
+    void when_lastnameInForeignLanguage_then_throwValidationException() {
         student.setFirstname("Иван");
         student.setLastname("Ivanov");
         student.setBirthDate("31-10-2010");
@@ -112,7 +112,7 @@ class StudentValidatorTest {
     }
 
     @Test
-    void shouldNotThrowOnLastnameWithOneRusWord() {
+    void when_lastnameIsSingleRussianWord_then_notThrow() {
         student.setFirstname("Иван");
         student.setLastname("Петров");
         student.setBirthDate("31-10-2010");
@@ -121,7 +121,7 @@ class StudentValidatorTest {
     }
 
     @Test
-    void shouldNotThrowOnLastnameTwoWordWithHyphen() {
+    void when_lastnameContainsHyphen_then_notThrow() {
         student.setFirstname("Иван");
         student.setLastname("Петров-Иванов");
         student.setBirthDate("31-10-2010");
@@ -130,7 +130,7 @@ class StudentValidatorTest {
     }
 
     @Test
-    void shouldNotThrowOnCorrectDate() {
+    void when_birthDateIsCorrectFormat_then_notThrow() {
         student.setFirstname("Иван");
         student.setLastname("Петров");
         student.setBirthDate("31-10-2010");
@@ -139,7 +139,7 @@ class StudentValidatorTest {
     }
 
     @Test
-    void shouldThrowOnIncorrectDate() {
+    void when_birthDateIsIncorrectFormat_then_throwValidationException() {
         student.setFirstname("Иван");
         student.setLastname("Петров");
         student.setBirthDate("2000-12-31");

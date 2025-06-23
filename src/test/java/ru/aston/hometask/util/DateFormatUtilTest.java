@@ -12,25 +12,25 @@ import static org.junit.jupiter.api.Assertions.*;
 class DateFormatUtilTest {
 
     @ParameterizedTest
-    @MethodSource("getTrueDateStrings")
-    void shouldReturnTrueOnCorrectDate(String date) {
+    @MethodSource("getValidDateStrings")
+    void when_dateStringIsValid_then_returnTrue(String date) {
         assertTrue(DateFormatUtil.isValidDate(date));
     }
 
     @ParameterizedTest
-    @MethodSource("getFalseDateStrings")
-    void shouldReturnFalseOnIncorrectDate(String date) {
+    @MethodSource("getInvalidDateStrings")
+    void when_dateStringIsInvalid_then_returnFalse(String date) {
         assertFalse(DateFormatUtil.isValidDate(date));
     }
 
-    static Stream<String> getTrueDateStrings() {
+    static Stream<String> getValidDateStrings() {
         return Stream.of(
                 "01-01-2020",
                 "31-01-2018",
                 "31-12-2024");
     }
 
-    static Stream<String> getFalseDateStrings() {
+    static Stream<String> getInvalidDateStrings() {
         return Stream.of(
                 "1-1-2020",
                 "12-31-2018",
@@ -39,7 +39,7 @@ class DateFormatUtilTest {
     }
 
     @Test
-    void shouldGetLocalDateFromString() {
+    void   when_parseValidDateString_then_returnLocalDate() {
         LocalDate expectResult = LocalDate.of(2020, 1, 1);
 
         LocalDate actualResult = DateFormatUtil.parseDateFromString("01-01-2020");
