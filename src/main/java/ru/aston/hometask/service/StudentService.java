@@ -11,26 +11,28 @@ import java.util.Comparator;
 import java.util.List;
 
 public class StudentService implements IStudentService {
-    private static final String PATH_STUDENT = "src/main/resources/students/listStudent.data";
-    private static final String PATH_SEARCH_HISTORY = "src/main/resources/HISTORY/history_search.data";
+    private static final String PATH_STUDENT = "students/listStudent.data";
+    private static final String PATH_SEARCH_HISTORY = "HISTORY/history_search.data";
 
     private final IValidator<Student> validator;
     private final IFileService<Student> fileService;
+    private final String pathDir;
 
-    public StudentService(IValidator<Student> validator, IFileService<Student> fileService) {
+    public StudentService(IValidator<Student> validator, IFileService<Student> fileService, String pathDir) {
         this.validator = validator;
         this.fileService = fileService;
+        this.pathDir = pathDir;
     }
 
     @Override
     public void save(Student student) {
         validator.valid(student);
-        fileService.printObject(Path.of(PATH_STUDENT), List.of(student));
+        fileService.printObject(getPath(PATH_STUDENT), List.of(student));
     }
 
     @Override
     public List<Student> getAll() {
-        return fileService.readAll(Path.of(PATH_STUDENT), Student.class)
+        return fileService.readAll(getPath(PATH_STUDENT), Student.class)
                 .stream()
                 .sorted(Comparator.comparing(Student::getLastname)
                         .thenComparing(Student::getFirstname))
@@ -51,8 +53,12 @@ public class StudentService implements IStudentService {
                         .thenComparing(Student::getFirstname))
                 .toList();
 
-        fileService.printObject(Path.of(PATH_SEARCH_HISTORY), students);
+        fileService.printObject(getPath(PATH_SEARCH_HISTORY), students);
 
         return students;
+    }
+
+    private Path getPath(String path) {
+        return Path.of(pathDir, path);
     }
 }

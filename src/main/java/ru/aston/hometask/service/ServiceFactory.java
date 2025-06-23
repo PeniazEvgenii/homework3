@@ -1,6 +1,7 @@
 package ru.aston.hometask.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ru.aston.hometask.config.PathConfiguration;
 import ru.aston.hometask.model.Student;
 import ru.aston.hometask.model.StudentMark;
 import ru.aston.hometask.service.api.IFileService;
@@ -23,12 +24,16 @@ public class ServiceFactory {
         IFileService<Student> studentFileService = new FileService<>(objectMapper);
         IFileService<String> subjectFileService = new FileService<>(objectMapper);
         IFileService<StudentMark> markFileService = new FileService<>(objectMapper);
+
         IValidator<Student> studentValidator = new StudentValidator();
         IValidator<String> subjectValidator = new SubjectValidator();
 
-        this.studentService = new StudentService(studentValidator, studentFileService);
-        this.subjectService = new SubjectService(subjectValidator, subjectFileService);
-        this.markService = new MarkService(markFileService);
+        PathConfiguration pathConfiguration = new PathConfiguration();
+        String storePath = pathConfiguration.getStorePath();
+
+        this.studentService = new StudentService(studentValidator, studentFileService,storePath);
+        this.subjectService = new SubjectService(subjectValidator, subjectFileService, storePath);
+        this.markService = new MarkService(markFileService, storePath);
     }
 
     public IStudentService getStudentService() {

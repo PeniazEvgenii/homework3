@@ -8,16 +8,16 @@ import java.nio.file.Path;
 import java.util.List;
 
 public class SubjectService implements ISubjectService {
-    private static final String PATH_SUBJECT = "src/main/resources/subjects/listSubject.data";
+    private static final String PATH_SUBJECT = "subjects/listSubject.data";
 
     private final IFileService<String> fileService;
     private final IValidator<String> validator;
     private final Path path;
 
-    public SubjectService(IValidator<String> validator, IFileService<String> fileService) {
+    public SubjectService(IValidator<String> validator, IFileService<String> fileService, String pathDir) {
         this.validator = validator;
         this.fileService = fileService;
-        this.path = Path.of(PATH_SUBJECT);
+        this.path = Path.of(pathDir, PATH_SUBJECT);
     }
 
     @Override

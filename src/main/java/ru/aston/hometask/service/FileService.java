@@ -24,7 +24,7 @@ public class FileService<T> implements IFileService<T> {
     @Override
     public void printString(Path path, String... strs) {
         checkExistDirectory(path);
-        // Files.write(path,Arrays.asList(strs), StandardOpenOption.CREATE,StandardOpenOption.APPEND)
+
         try (BufferedWriter bufferedWriter = Files.newBufferedWriter(
                 path,
                 StandardOpenOption.CREATE,
@@ -55,7 +55,7 @@ public class FileService<T> implements IFileService<T> {
         }
 
         try (BufferedReader bufferedReader = Files.newBufferedReader(path)) {
-            return bufferedReader.lines()                                            // можно Files.readAllLines(path).stream()
+            return bufferedReader.lines()
                     .filter(s -> !s.isBlank())
                     .toList();
         } catch (IOException e) {
