@@ -13,42 +13,59 @@ import ru.aston.hometask.service.validator.StudentValidator;
 import ru.aston.hometask.service.validator.SubjectValidator;
 
 public class ServiceFactory {
-    private static final ServiceFactory INSTANCE = new ServiceFactory();
+    private final PathConfiguration pathConfiguration;
+    private final ObjectMapper objectMapper;
 
-    private final IStudentService studentService;
-    private final ISubjectService subjectService;
-    private final IMarkService markService;
+    private IStudentService studentService;
+    private ISubjectService subjectService;
+    private IMarkService markService;
 
-    private ServiceFactory() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        IFileService<Student> studentFileService = new FileService<>(objectMapper);
-        IFileService<String> subjectFileService = new FileService<>(objectMapper);
-        IFileService<StudentMark> markFileService = new FileService<>(objectMapper);
-
-        IValidator<Student> studentValidator = new StudentValidator();
-        IValidator<String> subjectValidator = new SubjectValidator();
-
-        PathConfiguration pathConfiguration = new PathConfiguration();
-        String storePath = pathConfiguration.getStorePath();
-
-        this.studentService = new StudentService(studentValidator, studentFileService,storePath);
-        this.subjectService = new SubjectService(subjectValidator, subjectFileService, storePath);
-        this.markService = new MarkService(markFileService, storePath);
+    public ServiceFactory(PathConfiguration pathConfiguration, ObjectMapper objectMapper) {
+        this.pathConfiguration = pathConfiguration;
+        this.objectMapper = objectMapper;
     }
 
     public IStudentService getStudentService() {
+        if (studentService == null) {
+            studentService = createStudentService();
+        }
+
         return studentService;
     }
 
     public ISubjectService getSubjectService() {
+        if (subjectService == null) {
+            subjectService = createSubjectService();
+        }
+
         return subjectService;
     }
 
     public IMarkService getMarkService() {
+        if (markService == null) {
+            markService = createMarkService();
+        }
+
         return markService;
     }
 
-    public static ServiceFactory getInstance() {
-        return INSTANCE;
+    private IStudentService createStudentService() {
+        IFileService<Student> studentFileService = new FileService<>(objectMapper);
+        IValidator<Student> studentValidator = new StudentValidator();
+
+        return new StudentService(studentValidator, studentFileService, pathConfiguration.getStorePath());
+    }
+
+    private ISubjectService createSubjectService() {
+        IFileService<String> subjectFileService = new FileService<>(objectMapper);
+        IValidator<String> subjectValidator = new SubjectValidator();
+
+        return new SubjectService(subjectValidator, subjectFileService, pathConfiguration.getStorePath());
+    }
+
+    private IMarkService createMarkService() {
+        IFileService<StudentMark> markFileService = new FileService<>(objectMapper);
+
+        return new MarkService(markFileService, pathConfiguration.getStorePath());
     }
 }

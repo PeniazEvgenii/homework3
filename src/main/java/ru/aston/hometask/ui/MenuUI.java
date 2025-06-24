@@ -1,4 +1,4 @@
-package ru.aston.hometask;
+package ru.aston.hometask.ui;
 
 import ru.aston.hometask.model.Student;
 import ru.aston.hometask.model.StudentFilter;
@@ -18,7 +18,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
-public class Menu {
+public class MenuUI {
     private static final String MESSAGE_INCORRECT_INPUT = "Вы ввели неверное значение";
     private static final int MIN_MARK = 1;
     private static final int MAX_MARK = 10;
@@ -28,10 +28,10 @@ public class Menu {
     private final ISubjectService subjectService;
     private final IMarkService markService;
 
-    public Menu(Scanner scanner,
-                IStudentService studentService,
-                ISubjectService subjectService,
-                IMarkService markService) {
+    public MenuUI(Scanner scanner,
+                  IStudentService studentService,
+                  ISubjectService subjectService,
+                  IMarkService markService) {
         this.scanner = scanner;
         this.studentService = studentService;
         this.subjectService = subjectService;
